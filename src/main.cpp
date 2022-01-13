@@ -5,8 +5,8 @@
 #include <thread>
 #include <vector>
 
-const int grid_size{40};
-const int interval{200}; // milliseconds
+constexpr int grid_size{40};
+constexpr int interval{200}; // milliseconds
 
 int live_neighbours(int row, int col,
                     const std::vector<std::vector<int>>& board);
@@ -17,8 +17,12 @@ void update_field(std::list<int>& data, std::vector<std::vector<int>>& board);
 
 template <typename T>
 std::vector<T> subvector(const std::vector<T>& v, int m, int n) {
-    auto first = v.cbegin() + m;
-    auto last  = v.cbegin() + n + 1;
+    // return a copy of vector v, from index m to n
+    // TODO
+    // m and n are not bounds checked
+    // m is expected to be greater than n, but this isn't checked
+    const auto first = v.cbegin() + m;
+    const auto last  = v.cbegin() + n + 1;
 
     std::vector<T> vec(first, last);
     return vec;
