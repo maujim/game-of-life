@@ -8,14 +8,15 @@
 const int grid_size{40};
 const int interval{200}; // milliseconds
 
-int live_neighbours(const int& row, const int& col,
+int live_neighbours(int row, int col,
                     const std::vector<std::vector<int>>& board);
-void iterate(std::vector<std::vector<int>>& board, std::vector<std::vector<int>>& old_board);
+void iterate(std::vector<std::vector<int>>& board,
+             std::vector<std::vector<int>>& old_board);
 void show_field(const std::vector<std::vector<int>>& board);
 void update_field(std::list<int>& data, std::vector<std::vector<int>>& board);
 
 template <typename T>
-std::vector<T> subvector(const std::vector<T>& v, const int& m, const int& n) {
+std::vector<T> subvector(const std::vector<T>& v, int m, int n) {
     auto first = v.cbegin() + m;
     auto last  = v.cbegin() + n + 1;
 
@@ -29,19 +30,20 @@ int main(int argc, char* argv[]) {
         std::cout << std::string(1000, '\n');
     };
 
-    std::vector<std::vector<int>> field(grid_size, std::vector<int>(grid_size, 0));
+    std::vector<std::vector<int>> field(grid_size,
+                                        std::vector<int>(grid_size, 0));
     std::vector<std::vector<int>> field_prev{};
 
     // initiate field
     std::vector<std::list<int>> inital_state{{1, 25},
-                                   {2, 23, 25},
-                                   {3, 13, 14, 21, 22, 35, 36},
-                                   {4, 12, 16, 21, 22, 35, 36},
-                                   {5, 1, 2, 11, 17, 21, 22},
-                                   {6, 1, 2, 11, 15, 17, 18, 23, 25},
-                                   {7, 11, 17, 25},
-                                   {8, 12, 16},
-                                   {9, 13, 14}};
+                                             {2, 23, 25},
+                                             {3, 13, 14, 21, 22, 35, 36},
+                                             {4, 12, 16, 21, 22, 35, 36},
+                                             {5, 1, 2, 11, 17, 21, 22},
+                                             {6, 1, 2, 11, 15, 17, 18, 23, 25},
+                                             {7, 11, 17, 25},
+                                             {8, 12, 16},
+                                             {9, 13, 14}};
 
     for (std::list<int> row : inital_state) { update_field(row, field); }
 
@@ -90,7 +92,8 @@ void show_field(const std::vector<std::vector<int>>& board) {
     }
 }
 
-void iterate(std::vector<std::vector<int>>& board, std::vector<std::vector<int>>& old_board) {
+void iterate(std::vector<std::vector<int>>& board,
+             std::vector<std::vector<int>>& old_board) {
     /* RULES
      * Any live cell with two or three live neighbours survives.
      * Any dead cell with three live neighbours becomes a live cell.
@@ -119,8 +122,9 @@ void iterate(std::vector<std::vector<int>>& board, std::vector<std::vector<int>>
     }
 }
 
-int live_neighbours(const int& row, const int& col,
+int live_neighbours(int row, int col,
                     const std::vector<std::vector<int>>& board) {
+
     int neighbours = 0;
     const int m    = std::max(0, col - 1);
     const int n    = std::min(col + 1, grid_size);
