@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conway's Game of Life</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin: 20px;
+        }
+        .container {
+            text-align: center;
+        }
+        #generation {
+            font-family: monospace;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="generation">Generation: 0</div>
+    </div>
+    <script>
+        const GRID_SIZE = 40;
+        const CELL_SIZE = 15;
+        const INTERVAL = 200; // milliseconds
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const generationDisplay = document.getElementById('generation');
+
+        // Set canvas size
+        canvas.width = GRID_SIZE * CELL_SIZE;
+        canvas.height = GRID_SIZE * CELL_SIZE;
+
+        // Initialize grid
+        let grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+        
+        // Initial state (matching the C++ implementation)
+        const initialState = [
+            [1, [25]],
+            [2, [23, 25]],
+            [3, [13, 14, 21, 22, 35, 36]],
+            [4, [12, 16, 21, 22, 35, 36]],
+            [5, [1, 2, 11, 17, 21, 22]],
+            [6, [1, 2, 11, 15, 17, 18, 23, 25]],
+            [7, [11, 17, 25]],
+            [8, [12, 16]],
+            [9, [13, 14]]
+        ];
+
+        // Update field with initial state
+        function updateField(row, cols) {
+            cols.forEach(col => {
+                grid[row][col] = 1;
+            });
+        }
+
+        // Initialize the grid
+        initialState.forEach(([row, cols]) => updateField(row, cols));
+
+        function getLiveNeighbors(row, col, board) {
+            let neighbors = 0;
+            const m = Math.max(0, col - 1);
+            const n = Math.min(col + 1, GRID_SIZE - 1);
+
+            // Check row above
+            if (row !== 0) {
+                for (let i = m; i <= n; i++) {
+                    neighbors += board[row - 1][i];
+                }
+            }
+
+            // Check row below
+            if (row !== GRID_SIZE - 1) {
+                for (let i = m; i <= n; i++) {
+                    neighbors += board[row + 1][i];
+                }
+            }
+
+            // Check current row
+            for (let i = m; i <= n; i++) {
+                neighbors += board[row][i];
+            }
+
+            // Subtract the cell itself
+            neighbors -= board[row][col];
+
+            return neighbors;
+        }
+
+        function iterate(board) {
+            const newBoard = board.map(row => [...row]);
+
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const neighbors = getLiveNeighbors(row, col, board);
+                    const cell = board[row][col];
+
+                    if (cell === 1) {
+                        if (neighbors !== 2 && neighbors !== 3) {
+                            newBoard[row][col] = 0;
+                        }
+                    } else {
+                        if (neighbors === 3) {
+                            newBoard[row][col] = 1;
+                        }
+                    }
+                }
+            }
+
+            return newBoard;
+        }
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    if (grid[row][col] === 1) {
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(
+                            col * CELL_SIZE, 
+                            row * CELL_SIZE, 
+                            CELL_SIZE - 1, 
+                            CELL_SIZE - 1
+                        );
+                    }
+                }
+            }
+        }
+
+        let generation = 0;
+
+        function update() {
+            grid = iterate(grid);
+            drawGrid();
+            generation++;
+            generationDisplay.textContent = `Generation: ${generation}`;
+        }
+
+        // Initial draw
+        drawGrid();
+
+        // Start the animation
+        setInterval(update, INTERVAL);
+    </script>
+</body>
+</html>
